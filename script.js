@@ -179,3 +179,34 @@ if (prefersReducedMotion) {
     if (cursor) cursor.style.display = 'none';
     if (follower) follower.style.display = 'none';
 }
+
+// Enhanced typing animation with variable speed
+function typeWriter(element, text) {
+    let i = 0;
+    element.textContent = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    element.appendChild(cursor);
+    
+    function type() {
+        if (i < text.length) {
+            const char = document.createElement('span');
+            char.textContent = text.charAt(i);
+            char.style.animationDelay = '0s';
+            element.insertBefore(char, cursor);
+            i++;
+            const speed = text.charAt(i) === ' ' ? 20 : (Math.random() * 20 + 25);
+            setTimeout(type, speed);
+        } else {
+            setTimeout(() => cursor.style.animation = 'blink 0.8s ease-in-out infinite 0.3s', 200);
+        }
+    }
+    
+    setTimeout(type, 1000);
+}
+
+const heroDesc = document.querySelector('.hero-description');
+if (heroDesc && !prefersReducedMotion) {
+    const originalText = heroDesc.textContent;
+    typeWriter(heroDesc, originalText);
+}
