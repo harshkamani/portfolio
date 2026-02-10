@@ -11,18 +11,16 @@ document.addEventListener('mousemove', (e) => {
 });
 
 function animateCursor() {
-    const speed = 0.2;
-    const followerSpeed = 0.1;
+    const speed = 0.25;
+    const followerSpeed = 0.15;
     
     cursorX += (mouseX - cursorX) * speed;
     cursorY += (mouseY - cursorY) * speed;
     followerX += (mouseX - followerX) * followerSpeed;
     followerY += (mouseY - followerY) * followerSpeed;
     
-    cursor.style.left = cursorX + 'px';
-    cursor.style.top = cursorY + 'px';
-    follower.style.left = followerX + 'px';
-    follower.style.top = followerY + 'px';
+    cursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
+    follower.style.transform = `translate(${followerX}px, ${followerY}px) translate(-50%, -50%)`;
     
     requestAnimationFrame(animateCursor);
 }
