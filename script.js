@@ -52,55 +52,18 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Enhanced Intersection Observer for scroll animations
-const observerOptions = {
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
+// Scroll-reveal animation system
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-            const delay = entry.target.dataset.delay || 0;
-            setTimeout(() => {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                entry.target.classList.add('animated');
-            }, delay);
-            observer.unobserve(entry.target);
+            const delay = parseInt(entry.target.dataset.delay) || 0;
+            setTimeout(() => entry.target.classList.add('reveal'), delay);
+            revealObserver.unobserve(entry.target);
         }
     });
-}, observerOptions);
+}, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
 
-// Observe cards with stagger effect per section
-const sections = ['#projects', '#skills', '#about', '#journey'];
-sections.forEach(sectionId => {
-    const section = document.querySelector(sectionId);
-    if (section) {
-        const cards = section.querySelectorAll('.project-card, .skill-card, .info-card, .journey-card');
-        cards.forEach((el, index) => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(40px)';
-            el.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
-            el.dataset.delay = index * 100;
-            observer.observe(el);
-        });
-    }
-});
-
-// Section title animations
-const titleObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            titleObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.3 });
-
-document.querySelectorAll('.section-title').forEach(title => {
-    titleObserver.observe(title);
-});
+document.querySelectorAll('[data-animate], .section-title').forEach(el => revealObserver.observe(el));
 
 
 // Parallax scroll effect for hero background
@@ -116,7 +79,7 @@ window.addEventListener('scroll', () => {
 const tiltCards = document.querySelectorAll('.project-card, .skill-card, .journey-card');
 tiltCards.forEach(card => {
     card.addEventListener('mousemove', (e) => {
-        if (!card.classList.contains('animated')) return;
+        if (!card.classList.contains('reveal')) return;
         
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -130,7 +93,7 @@ tiltCards.forEach(card => {
     });
     
     card.addEventListener('mouseleave', () => {
-        if (card.classList.contains('animated')) {
+        if (card.classList.contains('reveal')) {
             card.style.transform = 'translateY(0)';
         }
     });
@@ -178,4 +141,29 @@ if (prefersReducedMotion) {
     document.body.style.cursor = 'auto';
     if (cursor) cursor.style.display = 'none';
     if (follower) follower.style.display = 'none';
+}
+
+// Typing animation for hero description
+function typeText(element, text, speed = 30) {
+    let index = 0;
+    element.textContent = '';
+    
+    function type() {
+        if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            const variance = Math.random() * 20 - 10;
+            setTimeout(type, speed + variance);
+        } else {
+            setTimeout(() => element.classList.add('typing-complete'), 800);
+        }
+    }
+    
+    setTimeout(type, 1000);
+}
+
+const heroDescription = document.querySelector('.hero-description[data-typing]');
+if (heroDescription && !prefersReducedMotion) {
+    const text = heroDescription.getAttribute('data-typing');
+    typeText(heroDescription, text);
 }
